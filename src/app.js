@@ -1,19 +1,17 @@
 const express = require("express");
 const app = express();
 
-app.use("/",(req, res) => {
-    res.send("Hello from the dashboard");
-});
+// this will only handle get call to /user
+app.get("/user/:userId/:name/:password", (req, res) => {
+    console.log(req.params);
+    res.send({
+        firstName: "Prachi",
+        lastName: "shree"
+    });
+}); 
 
-app.use("/hello",(req, res) => {
-    res.send("Hello Hello Hello");
-});
-
-app.use("/test",(req, res) => {
-    res.send("Hello from the server!!!");
-});
 
 app.listen(7777, () => {
     console.log("Server is successfully listening at port number 7777...");
 });
- 
+  
