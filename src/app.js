@@ -8,7 +8,7 @@ app.use(express.json());
 
 app.post("/signup", async (req, res) => {
 
-    //Creating new instance of user model 
+    //Creating new instance of user model  
     const user = new User(req.body);
     try {
         await user.save();
@@ -21,7 +21,7 @@ app.post("/signup", async (req, res) => {
 //Get user by email
 app.get("/user", async (req, res) => {
     const userEmail = req.body.emailId;
-   // const userId = req.body._id; 
+    //const userId = req.body._id; 
     try {
 
         // const user = await User.find({_id:userId})
@@ -31,22 +31,25 @@ app.get("/user", async (req, res) => {
         //      res.send(user);
         // }
 
-        const user = await User.findOne  ({ emailId: userEmail });
-        if(!user){
-            res.status(404).send("User not found!");
-        }else{
-             res.send(user);
-        }
 
-        //const user = await User.find({
-        // emailId: userEmail
-        //  })
-        //  if(user.length === 0){
-        //     res.status(404).send("User not found");
-        //  }
-        //  else{
-        //      res.send(user); 
-        //  }
+        // const user = await User.findOne({ emailId: userEmail });
+        // if(!user){
+        //     res.status(404).send("User not found!");
+        // }else{
+        //      res.send(user);  
+        // }
+
+
+        const user = await User.find({
+        emailId: userEmail
+         })
+         if(user.length === 0){
+            res.status(404).send("User not found");
+         }
+         else{
+             res.send(user); 
+         }
+              
            
     } catch (err) {
         res.status(400).send("Something went wrong!!");
@@ -78,25 +81,52 @@ app.delete("/user",async(req,res) => {
 })
 
 //Update User
-app.patch("/user",async(req, res) => {
-    const userId = req.body.userId;
+app.patch("/user/:userId",async(req, res) => {
+   const userId = req.params?.userId;
+   //const userEmail = req.body.emailId; 
    const data = req.body; 
+   
    try{
-       const user = await User.findByIdAndUpdate({_id:userId},data , {returnDocument:"after"});
-       console.log(user);
-        res.send("User Updated successfully")
-   }catch{
-     res.status(400).send("Something went wrong!!")
+
+    const ALLOWED_UPDATE = [
+    "photoUrl", "about", "gender", "age", "skills"
+   ]
+   const isUpdateAllowed = Object.keys(data).every((k) => ALLOWED_UPDATE.includes(k))
+   if(!isUpdateAllowed){
+    throw new Error("Update not allowed");
+   }
+   if(data?.skills.length >10){
+    throw new Error("Skills cannot be more than 10")
+   }
+
+    // const user = await User.findOneAndUpdate({emailId:userEmail},data,{
+    // returnDocument:"after",
+    // runValidators: true
+    // })
+
+    const user = await User.findByIdAndUpdate({_id:userId},data , {returnDocument:"after",runValidators: true});
+
+    console.log(user);
+    res.send("User Updated successfully")
+   }catch(err){
+     res.status(400).send("UUDATE FAILED!"+err.message);
    }   
 })  
 
 
-connectDB().then(() => {
+connectDB().then(async() => {
     console.log("Database connection established...");
+    try{
+        await User.syncIndexes();
+        console.log("Database indexes synchronized successfully.")
+    }catch(indexErr){
+        console.error("Failed to build unique index. Check for existing duplicate");
+    }
     app.listen(7777, () => {
         console.log("Server is successfully listening at port number 7777...");
     });
 }).catch(err => {
     console.error("Database cannot be connected!!!");
 })
+ 
 
