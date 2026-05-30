@@ -42,11 +42,11 @@ const userSchema = new mongoose.Schema({
             if(!["male","femail","other"].includes(value)){
                 throw new Error("Gender data is not valid");
             }
-        }
+        } 
     },
     photoUrl:{
         type:String,
-        default:"https://avatars.githubusercontent.com/u/1484030?v=4 ",
+        default:"https://img.magnific.com/premium-vector/young-man-avatar-character-due-avatar-man-vector-icon-cartoon-illustration_1186924-4438.jpg?semt=ais_hybrid&w=740&q=80",
           validate(value){
             if(!validator.isURL(value)){
                 throw new Error("Invalid photo url!"+value); 
