@@ -17,8 +17,9 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) => {
         //  }).populate("fromUserId",["firstName","lastName","photoUrl","about"]) 
 
         if (connectionRequest.length === 0) {
-            return res.status(404).json({
-                message: "There's no connection request received"
+            return res.status(200).json({
+                message: "No connection requests found",
+                data: []
             });
         }
 
@@ -43,61 +44,61 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
                 { fromUserId: loggedInUser._id, status: "accepted" }
             ]
         }).populate("fromUserId", USER_SAFE_DATA)
-        .populate("toUserId", USER_SAFE_DATA)
+            .populate("toUserId", USER_SAFE_DATA)
 
         const data = connectionRequest.map((row) => {
-            if(row.fromUserId._id.toString() === loggedInUser._id.toString()){
+            if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
                 return row.toUserId;
             }
             return row.fromUserId;
         })
 
-        res.json({data:data});
+        res.json({ data: data });
     } catch (err) {
         res.status(400).send({ message: err.message });
     }
 })
 
- 
-userRouter.get("/feed", userAuth, async(req, res) => {
-    try{
+
+userRouter.get("/feed", userAuth, async (req, res) => {
+    try {
 
         const loggedInUser = req.user;
 
         const page = parseInt(req.query.page) || 1;
-        let limit= parseInt(req.query.limit) || 10;
-        limit = limit>50?50 :limit;
+        let limit = parseInt(req.query.limit) || 10;
+        limit = limit > 50 ? 50 : limit;
 
-        const skip = (page-1)*limit;
+        const skip = (page - 1) * limit;
 
 
         const connectionRequest = await ConnectionRequest.find({
-            $or: [{fromUserId: loggedInUser._id},{toUserId:loggedInUser._id}]
+            $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }]
         }).select("fromUserId toUserId")
         // .populate("fromUserId","firstName")
         // .populate("toUserId","firstName ")
 
         const hideUserFromFeed = new Set();
-         connectionRequest.forEach(req => {
+        connectionRequest.forEach(req => {
             hideUserFromFeed.add(req.fromUserId.toString());
             hideUserFromFeed.add(req.toUserId.toString());
-         }) 
+        })
 
-         const users = await User.find({
-          $and:[
-            {_id: {$nin: Array.from(hideUserFromFeed)},},//not in
-            {_id:{$ne:loggedInUser._id}},   //not equal to
-          ],
-         }).select(USER_SAFE_DATA).skip(skip).limit(limit);
+        const users = await User.find({
+            $and: [
+                { _id: { $nin: Array.from(hideUserFromFeed) }, },//not in
+                { _id: { $ne: loggedInUser._id } },   //not equal to
+            ],
+        }).select(USER_SAFE_DATA).skip(skip).limit(limit);
 
-         if(users.length === 0){
-            return res.status(400).send({message:"theres no user left!"})
-         }
-         
-        res.json({data:users});  
+        if (users.length === 0) {
+            return res.status(400).send({ message: "theres no user left!" })
+        }
 
-    }catch(err){
-        res.status(400).send({ message: err.message});
+        res.json({ data: users });
+
+    } catch (err) {
+        res.status(400).send({ message: err.message });
     }
 })
 
