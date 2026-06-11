@@ -3,6 +3,7 @@ const connectDB = require("./config/database")
 const app = express();   
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+const User = require("./models/user");
 
 app.use(express.json());
 app.use(cookieParser());

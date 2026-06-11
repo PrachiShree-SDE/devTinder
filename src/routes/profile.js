@@ -17,6 +17,7 @@ profileRouter.get("/profile/view"  , userAuth, async(req, res) => {
     }
 })
 
+
 profileRouter.put("/profile/edit",userAuth,async(req,res) => {
         try{
             if(!validateEditProfileData(req)){
@@ -37,7 +38,7 @@ profileRouter.put("/profile/edit",userAuth,async(req,res) => {
         }
 }) 
 
-profileRouter.patch("/profile/forgotpassword",userAuth, async(req,res) => {
+profileRouter.patch("/profile/changePassword",userAuth, async(req,res) => {
     try{
     const {password, newPassword, confirmNewPassword} = req.body;
     const loggedInUser = req.user;

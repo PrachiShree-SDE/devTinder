@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const validator = require("validator")
 
 
+
 authRouter.post("/signup", async (req, res) => {
   try { 
  // Validation of data
