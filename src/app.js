@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin:true,
     credentials: true, 
 }));
 
@@ -36,7 +36,7 @@ connectDB().then(async() => {
     }catch(indexErr){
         console.error("Failed to build unique index. Check for existing duplicate");
     }
-    app.listen(7777, () => {
+    app.listen(7777,"0.0.0.0", () => {
         console.log("Server is successfully listening at port number 7777...");
     });
 }).catch(err => {
