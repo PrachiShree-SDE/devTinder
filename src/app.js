@@ -37,12 +37,10 @@ connectDB().then(async() => {
     }catch(indexErr){
         console.error("Failed to build unique index. Check for existing duplicate");
     }
-    // app.listen(7777,"0.0.0.0", () => {
-    //     console.log("Server is successfully listening at port number 7777...");
-    // });
-     app.listen(80,"0.0.0.0", () => {
-        console.log("Server is successfully listening at port number 80...");
+    app.listen(7777,"0.0.0.0", () => {
+        console.log("Server is successfully listening at port number 7777...");
     });
+    
 }).catch(err => {
     console.error("Database cannot be connected!!!");
 })
